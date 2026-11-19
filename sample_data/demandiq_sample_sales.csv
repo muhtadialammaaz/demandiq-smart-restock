@@ -1,0 +1,40 @@
+date,sku,product_name,qty,unit_price
+2024-01-01,PANJABI-001,Premium Cotton Panjabi White,3,1850
+2024-01-01,SAREE-002,Dhakai Jamdani Saree Crimson,1,4500
+2024-01-01,KURTI-003,Floral Embroidered Kurti,4,1200
+2024-01-01,POLO-004,Classic Pique Polo Navy,5,850
+2024-01-02,PANJABI-001,Premium Cotton Panjabi White,4,1850
+2024-01-02,TSHIRT-005,Urban Graphic Tee Olive,7,650
+2024-01-03,SAREE-002,Dhakai Jamdani Saree Crimson,2,4500
+2024-01-03,KABLI-006,Royal Kabli Suit Charcoal,2,2950
+2024-01-04,PANJABI-001,Premium Cotton Panjabi White,5,1850
+2024-01-04,JEANS-007,Slim Stretch Denim Jeans,3,1650
+2024-01-05,KURTI-003,Floral Embroidered Kurti,6,1200
+2024-01-05,POLO-004,Classic Pique Polo Navy,4,850
+2024-02-14,SAREE-002,Dhakai Jamdani Saree Crimson,8,4500
+2024-02-14,PANJABI-001,Premium Cotton Panjabi White,9,1850
+2024-03-25,PANJABI-001,Premium Cotton Panjabi White,18,1850
+2024-03-26,SAREE-002,Dhakai Jamdani Saree Crimson,12,4500
+2024-03-28,KABLI-006,Royal Kabli Suit Charcoal,11,2950
+2024-04-05,PANJABI-001,Premium Cotton Panjabi White,24,1850
+2024-04-06,KURTI-003,Floral Embroidered Kurti,19,1200
+2024-04-08,SAREE-002,Dhakai Jamdani Saree Crimson,15,4500
+2024-04-09,KABLI-006,Royal Kabli Suit Charcoal,14,2950
+2024-04-10,PANJABI-001,Premium Cotton Panjabi White,28,1850
+2024-04-14,SAREE-002,Dhakai Jamdani Saree Crimson,16,4500
+2024-04-14,KURTI-003,Floral Embroidered Kurti,14,1200
+2024-05-01,POLO-004,Classic Pique Polo Navy,6,850
+2024-06-12,PANJABI-001,Premium Cotton Panjabi White,19,1850
+2024-06-15,KABLI-006,Royal Kabli Suit Charcoal,15,2950
+2024-07-01,JEANS-007,Slim Stretch Denim Jeans,4,1650
+2024-08-10,TSHIRT-005,Urban Graphic Tee Olive,8,650
+2024-09-15,KURTI-003,Floral Embroidered Kurti,7,1200
+2024-10-10,SAREE-002,Dhakai Jamdani Saree Crimson,9,4500
+2024-11-11,PANJABI-001,Premium Cotton Panjabi White,25,1850
+2024-11-11,SAREE-002,Dhakai Jamdani Saree Crimson,18,4500
+2024-11-11,KURTI-003,Floral Embroidered Kurti,22,1200
+2024-11-11,POLO-004,Classic Pique Polo Navy,20,850
+2024-11-11,KABLI-006,Royal Kabli Suit Charcoal,16,2950
+2024-11-11,JEANS-007,Slim Stretch Denim Jeans,15,1650
+2024-12-16,PANJABI-001,Premium Cotton Panjabi White,12,1850
+2024-12-25,TSHIRT-005,Urban Graphic Tee Olive,10,650

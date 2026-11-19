@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DemandIQ Smart Restock | AI Inventory Forecasting for Retailers & F-Commerce</title>
+  <meta name="description" content="Upload sales CSV, and within 60 seconds know what to reorder, when stock runs out, and how much money is at stake in simple Bangla.">
+  
+  <!-- Google Fonts: Inter & Hind Siliguri / Noto Sans Bengali -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+
+  <!-- Three.js (r128) & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  
+  <!-- Chart.js for Forecast Visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Canvas Confetti for celebratory micro-actions -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body class="lang-bn">
+
+  <!-- Ambient Glowing Background Spheres -->
+  <div class="ambient-glow">
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
+    <div class="glow-orb-3"></div>
+  </div>
+  <div class="cyber-grid"></div>
+
+  <!-- Honest Synthetic Data Banner (PRD Principle 5.1 & Honesty Rules) -->
+  <div class="honest-banner">
+    <span>⚠️ <strong>নমুনা ডেটা — আসল দোকানের ডেটা নয়</strong> (Synthetic Prototype for CommerceSphere AI Hackathon)</span>
+  </div>
+
+  <!-- Main Sticky Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="nav-wrapper">
+        <!-- Logo -->
+        <a href="#" class="brand-logo">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+              <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+              <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+          </div>
+          <div class="brand-name">
+            DemandIQ
+            <span class="sub">Smart Restock</span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <ul class="nav-menu">
+          <li><a href="#three-section" class="nav-link" data-i18n-en="3D Warehouse" data-i18n-bn="৩ডি গুদাম">৩ডি গুদাম</a></li>
+          <li><a href="#three-numbers" class="nav-link" data-i18n-en="Money at Risk" data-i18n-bn="ঝুঁকিতে থাকা টাকা">ঝুঁকিতে থাকা টাকা</a></li>
+          <li><a href="#live-demo" class="nav-link" data-i18n-en="Live Dashboard" data-i18n-bn="লাইভ ড্যাশবোর্ড">লাইভ ড্যাশবোর্ড</a></li>
+          <li><a href="#events-section" class="nav-link" data-i18n-en="Event Calendar" data-i18n-bn="উৎসব ক্যালেন্ডার">উৎসব ক্যালেন্ডার</a></li>
+          <li><a href="#roi-calculator" class="nav-link" data-i18n-en="ROI Calculator" data-i18n-bn="লাভ ক্যালকুলেটর">লাভ ক্যালকুলেটর</a></li>
+          <li><a href="#method-section" class="nav-link" data-i18n-en="Methodology" data-i18n-bn="অ্যালগরিদম">অ্যালগরিদম</a></li>
+        </ul>
+
+        <!-- Right Side Actions & Language Switcher -->
+        <div class="nav-actions">
+          <button class="lang-toggle-btn" id="lang-toggle" title="Toggle Language (English / বাংলা)">
+            <span id="lang-bn-pill" class="active">বাং</span>
+            <span id="lang-en-pill">EN</span>
+          </button>
+          <a href="#upload-section" class="btn btn-secondary btn-sm" data-i18n-en="Upload CSV" data-i18n-bn="CSV আপলোড">CSV আপলোড</a>
+          <a href="#live-demo" class="btn btn-primary btn-sm" data-i18n-en="Try Demo" data-i18n-bn="ডেমো দেখুন">ডেমো দেখুন</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==========================================================================
+       HERO SECTION WITH 3D WEBGL ISOMETRIC WAREHOUSE VISUAL
+       ========================================================================== -->
+  <section class="hero-section" id="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <!-- Hero Left Content -->
+        <div class="hero-content">
+          <div class="hackathon-pill">
+            <span class="pulse-dot"></span>
+            <span data-i18n-en="CommerceSphere AI Hackathon Track • 60-Second Intelligence" data-i18n-bn="কমার্সস্ফেয়ার এআই হ্যাকাথন • ৬০ সেকেন্ডে সিদ্ধান্ত">কমার্সস্ফেয়ার এআই হ্যাকাথন • ৬০ সেকেন্ডে সিদ্ধান্ত</span>
+          </div>
+
+          <h1 class="hero-title">
+            <span data-i18n-en="Stop Guessing Stock." data-i18n-bn="অনুমান নির্ভর ব্যবসা আর নয়।">অনুমান নির্ভর ব্যবসা আর নয়।</span><br>
+            <span class="text-gradient" data-i18n-en="Decisions, Not Charts." data-i18n-bn="সিদ্ধান্ত নিন, শুধু চার্ট নয়।">সিদ্ধান্ত নিন, শুধু চার্ট নয়।</span>
+          </h1>
+
+          <p class="hero-desc" data-i18n-en="Upload your sales CSV. Within 60 seconds know what to reorder, when stock runs out, and how much ৳ is at risk — explained in simple Bangla before Eid & sale rush." data-i18n-bn="আপনার বিক্রির CSV ফাইল দিন। ৬০ সেকেন্ডের মধ্যে জানুন কোন পণ্য কবে শেষ হবে, কতটুকু অর্ডার করতে হবে এবং কত টাকার ঝুঁকি রয়েছে — সহজ বাংলায়।">
+            আপনার বিক্রির CSV ফাইল দিন। ৬০ সেকেন্ডের মধ্যে জানুন কোন পণ্য কবে শেষ হবে, কতটুকু অর্ডার করতে হবে এবং কত টাকার ঝুঁকি রয়েছে — সহজ বাংলায়।
+          </p>
+
+          <div class="hero-ctas">
+            <a href="#live-demo" class="btn btn-primary btn-lg" data-i18n-en="Explore Live Dashboard" data-i18n-bn="লাইভ ড্যাশবোর্ড দেখুন">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>লাইভ ড্যাশবোর্ড দেখুন</span>
+            </a>
+            <a href="#three-section" class="btn btn-secondary btn-lg" data-i18n-en="Inspect 3D Warehouse" data-i18n-bn="৩ডি গুদাম ঘুরে দেখুন">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+              <span>৩ডি গুদাম ঘুরে দেখুন</span>
+            </a>
+          </div>
+
+          <div class="hero-stats-row">
+            <div class="hero-stat-item">
+              <span class="hero-stat-num text-gradient-taka" id="hero-stat-saved">৳১২,৪০,০০০+</span>
+              <span class="hero-stat-label" data-i18n-en="Money at Risk Saved" data-i18n-bn="রক্ষা করা বিক্রির টাকা">রক্ষা করা বিক্রির টাকা</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-num" id="hero-stat-speed">&lt; ৬০ সেকেন্ড</span>
+              <span class="hero-stat-label" data-i18n-en="Processing Pipeline" data-i18n-bn="অ্যানালাইসিস সময়">অ্যানালাইসিস সময়</span>
+            </div>
+            <div class="hero-stat-item">
+              <span class="hero-stat-num" style="color: var(--accent-cyan);">১০০% অফলাইন</span>
+              <span class="hero-stat-label" data-i18n-en="Demo Reliability" data-i18n-bn="ডেমো কাজ করবে অফলাইনেও">ডেমো কাজ করবে অফলাইনেও</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Right: Interactive 3D WebGL Canvas Stage -->
+        <div class="hero-3d-stage" id="three-section">
+          <div id="three-container" style="width: 100%; height: 100%;"></div>
+
+          <!-- 3D HUD Top Badges -->
+          <div class="canvas-hud-top">
+            <div class="hud-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+              <span>3D DIGITAL TWIN • REAL-TIME RADAR</span>
+            </div>
+            <div class="hud-badge" style="color: var(--accent-emerald);">
+              <span>● LIVE SIMULATION</span>
+            </div>
+          </div>
+
+          <!-- 3D Floating Tooltip for Raycaster -->
+          <div class="three-tooltip" id="three-tooltip">
+            <span class="three-tooltip-badge" id="tooltip-badge">CRITICAL</span>
+            <div class="three-tooltip-title" id="tooltip-title">Premium Cotton Panjabi</div>
+            <div id="tooltip-sku" style="color: var(--text-muted); font-size: 0.75rem;">PANJABI-001 • 1.8 Days Cover</div>
+            <div id="tooltip-stock" style="margin-top: 6px; font-weight: 600;">Stock: 4 units</div>
+          </div>
+
+          <!-- 3D Interactive Controls Toolbar -->
+          <div class="canvas-controls-bar">
+            <button class="hud-control-btn active" id="btn-3d-rotate" title="Auto Orbit">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              <span>Auto Rotate</span>
+            </button>
+            <button class="hud-control-btn" id="btn-3d-explode" title="Explode View">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Explode</span>
+            </button>
+            <button class="hud-control-btn" id="btn-3d-wireframe" title="Toggle Wireframe">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="m4.93 4.93 4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></svg>
+              <span>Wireframe</span>
+            </button>
+            <button class="hud-control-btn" id="btn-3d-reset" title="Reset View">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+              <span>Reset</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION 5.1: THREE NUMBERS FIRST (PRD REQUIREMENT)
+       "Three numbers first: the shopkeeper sees Money at Risk, Items Needing Action,
+       and Cash Tied Up before anything else."
+       ========================================================================== -->
+  <section class="section-three-numbers" id="three-numbers">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="PRD Principle 5.1 • Shopkeeper First" data-i18n-bn="পিআরডি মূলনীতি ৫.১ • সবার আগে জরুরি ৩ সংখ্যা">পিআরডি মূলনীতি ৫.১ • সবার আগে জরুরি ৩ সংখ্যা</span>
+        <h2 class="section-title" data-i18n-en="Three Numbers Every Seller Needs to See" data-i18n-bn="দোকানি সবার আগে যে ৩টি সংখ্যা দেখবেন">দোকানি সবার আগে যে ৩টি সংখ্যা দেখবেন</h2>
+        <p class="section-subtitle" data-i18n-en="No confusing statistical formulas. We translate entire forecasting models directly into actionable Bangladeshi Taka (৳)." data-i18n-bn="কোনো জটিল গাণিতিক চার্ট নয় — সমস্ত পূর্বাভাস সরাসরি টাকায় এবং সুস্পষ্ট পদক্ষেপে রূপান্তরিত।">
+          কোনো জটিল গাণিতিক চার্ট নয় — সমস্ত পূর্বাভাস সরাসরি টাকায় এবং সুস্পষ্ট পদক্ষেপে রূপান্তরিত।
+        </p>
+      </div>
+
+      <div class="kpi-cards-grid">
+        <!-- 1. Money at Risk (Total) -->
+        <div class="kpi-card card-risk-total">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrap" style="background: rgba(239, 68, 68, 0.15); color: #EF4444;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <span class="kpi-pill" style="background: rgba(239, 68, 68, 0.15); color: #F87171;" data-i18n-en="CRITICAL RISK" data-i18n-bn="মোট ঝুঁকি">মোট ঝুঁকি</span>
+          </div>
+          <div class="kpi-val text-gradient-alert" id="kpi-risk-total">৳৩,৪২,৮০০</div>
+          <div class="kpi-title-en" data-i18n-en="Total Money at Risk" data-i18n-bn="ঝুঁকিতে থাকা টাকা">ঝুঁকিতে থাকা টাকা</div>
+          <div class="kpi-title-bn" data-i18n-en="Lost sales exposure + locked dead capital" data-i18n-bn="হারানো সম্ভাব্য বিক্রি + আটকে থাকা মৃত মূলধন">হারানো সম্ভাব্য বিক্রি + আটকে থাকা মৃত মূলধন</div>
+          <div class="kpi-meta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+            <span data-i18n-en="Immediate action needed before Eid" data-i18n-bn="ঈদের আগে এখনই জরুরি ব্যবস্থা নিন">ঈদের আগে এখনই জরুরি ব্যবস্থা নিন</span>
+          </div>
+        </div>
+
+        <!-- 2. Lost-sales Risk -->
+        <div class="kpi-card card-lost-sales">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.15); color: #F59E0B;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <span class="kpi-pill" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24;" data-i18n-en="LOST SALES" data-i18n-bn="হারানো বিক্রি">হারানো বিক্রি</span>
+          </div>
+          <div class="kpi-val" style="color: #F59E0B;" id="kpi-lost-sales">৳২,১৫,০০০</div>
+          <div class="kpi-title-en" data-i18n-en="Lost-Sales Risk" data-i18n-bn="হারাতে পারেন এমন বিক্রি">হারাতে পারেন এমন বিক্রি</div>
+          <div class="kpi-title-bn" data-i18n-en="Demand lost because stock runs out before delivery" data-i18n-bn="ডেলিভারির আগেই স্টক শেষ হওয়ায় হারানো বিক্রি">ডেলিভারির আগেই স্টক শেষ হওয়ায় হারানো বিক্রি</div>
+          <div class="kpi-meta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            <span data-i18n-en="Supplier lead time is the key bottleneck" data-i18n-bn="সাপ্লায়ারের আসার সময় মূল বাধা">সাপ্লায়ারের আসার সময় মূল বাধা</span>
+          </div>
+        </div>
+
+        <!-- 3. Cash Tied Up -->
+        <div class="kpi-card card-cash-tied">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.15); color: #3B82F6;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            </div>
+            <span class="kpi-pill" style="background: rgba(59, 130, 246, 0.15); color: #60A5FA;" data-i18n-en="TRAPPED CASH" data-i18n-bn="আটকে থাকা টাকা">আটকে থাকা টাকা</span>
+          </div>
+          <div class="kpi-val" style="color: #60A5FA;" id="kpi-cash-tied">৳১,২৭,৮০০</div>
+          <div class="kpi-title-en" data-i18n-en="Cash Tied Up" data-i18n-bn="আটকে থাকা টাকা">আটকে থাকা টাকা</div>
+          <div class="kpi-title-bn" data-i18n-en="Capital locked in slow/dead inventory for >60 days" data-i18n-bn="ধীরগতির বা অবিক্রিত পণ্যে আটকে থাকা মূলধন">ধীরগতির বা অবিক্রিত পণ্যে আটকে থাকা মূলধন</div>
+          <div class="kpi-meta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span data-i18n-en="Bundle promotions recommended to unlock" data-i18n-bn="ক্লিয়ারেন্স অফার দিয়ে ক্যাশ মুক্ত করুন">ক্লিয়ারেন্স অফার দিয়ে ক্যাশ মুক্ত করুন</span>
+          </div>
+        </div>
+
+        <!-- 4. Items Needing Action -->
+        <div class="kpi-card card-action-count">
+          <div class="kpi-card-header">
+            <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10B981;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+            </div>
+            <span class="kpi-pill" style="background: rgba(16, 185, 129, 0.15); color: #34D399;" data-i18n-en="ACTIONABLE" data-i18n-bn="পদক্ষেপ দরকার">পদক্ষেপ দরকার</span>
+          </div>
+          <div class="kpi-val text-gradient-taka" id="kpi-action-count">১৪ টি পণ্য</div>
+          <div class="kpi-title-en" data-i18n-en="Items Needing Action" data-i18n-bn="যেসব পণ্যে এখনই পদক্ষেপ দরকার">যেসব পণ্যে এখনই পদক্ষেপ দরকার</div>
+          <div class="kpi-title-bn" data-i18n-en="Every non-OK SKU has an exact order quantity" data-i18n-bn="প্রতিটি পণ্যের জন্য সুস্পষ্ট অর্ডার সংখ্যা নির্দিষ্ট">প্রতিটি পণ্যের জন্য সুস্পষ্ট অর্ডার সংখ্যা নির্দিষ্ট</div>
+          <div class="kpi-meta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
+            <span data-i18n-en="One-click order to WhatsApp" data-i18n-bn="এক ক্লিকে WhatsApp-এ অর্ডার">এক ক্লিকে WhatsApp-এ অর্ডার</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SCROLL GRAPHICS: BEFORE VS AFTER COMPARISON
+       ========================================================================== -->
+  <section class="section-comparison" id="comparison">
+    <div class="container">
+      <div class="comparison-box">
+        <div class="comparison-grid">
+          <!-- Before: Guesswork Chaos -->
+          <div class="comparison-side side-before">
+            <span class="comparison-badge badge-red">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+              <span>বিগত দিনের সমস্যা (BEFORE)</span>
+            </span>
+            <h3 data-i18n-en="The Guesswork Trap" data-i18n-bn="খাতার হিসাব ও অনুমানের ফাঁদ">খাতার হিসাব ও অনুমানের ফাঁদ</h3>
+            <p data-i18n-en="Small retailers and Facebook sellers reorder by gut feeling. Fast items run out in the middle of Eid rush, while dead stock sits for months." data-i18n-bn="খাতা বা এক্সেলের অনুমানে অর্ডার করায় ঈদের আগের রাতে সেরা পাঞ্জাবির স্টক শেষ হয়, আর অবিক্রিত পণ্যে লাখ টাকা আটকে থাকে।">
+              খাতা বা এক্সেলের অনুমানে অর্ডার করায় ঈদের আগের রাতে সেরা পাঞ্জাবির স্টক শেষ হয়, আর অবিক্রিত পণ্যে লাখ টাকা আটকে থাকে।
+            </p>
+            <ul class="comparison-list">
+              <li>
+                <span style="color: #EF4444;">✕</span>
+                <span data-i18n-en="35% of cash trapped in non-moving products" data-i18n-bn="৩৫% নগদ টাকা অবিক্রিত মালে মাসের পর মাস আটকে থাকে">৩৫% নগদ টাকা অবিক্রিত মালে মাসের পর মাস আটকে থাকে</span>
+              </li>
+              <li>
+                <span style="color: #EF4444;">✕</span>
+                <span data-i18n-en="Sudden stockouts right when festival demand peaks" data-i18n-bn="উৎসবের পিক সিজনে হঠাৎ স্টক শেষ হয়ে ক্রেতারা ফিরে যায়">উৎসবের পিক সিজনে হঠাৎ স্টক শেষ হয়ে ক্রেতারা ফিরে যায়</span>
+              </li>
+              <li>
+                <span style="color: #EF4444;">✕</span>
+                <span data-i18n-en="Confusing enterprise charts with no actionable answer" data-i18n-bn="জটিল গ্রাফ কিন্তু কাল সকালে কয় পিস অর্ডার করতে হবে তার উত্তর নেই">জটিল গ্রাফ কিন্তু কাল সকালে কয় পিস অর্ডার করতে হবে তার উত্তর নেই</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- After: DemandIQ Precision -->
+          <div class="comparison-side side-after">
+            <span class="comparison-badge badge-green">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>DemandIQ এআই সমাধান (AFTER)</span>
+            </span>
+            <h3 class="text-gradient" data-i18n-en="Decisions in Simple Bangla" data-i18n-bn="সহজ বাংলায় স্পষ্ট সিদ্ধান্ত">সহজ বাংলায় স্পষ্ট সিদ্ধান্ত</h3>
+            <p data-i18n-en="DemandIQ removes guesswork. It factors in supplier lead times, learned Eid multipliers, and tells you the exact reorder quantity today." data-i18n-bn="সাপ্লায়ারের লিড টাইম ও অতীতের উৎসবের বিক্রির ইতিহাস শিখে DemandIQ আপনাকে ঠিক কত পিস আজই অর্ডার করতে হবে তা জানিয়ে দেয়।">
+              সাপ্লায়ারের লিড টাইম ও অতীতের উৎসবের বিক্রির ইতিহাস শিখে DemandIQ আপনাকে ঠিক কত পিস আজই অর্ডার করতে হবে তা জানিয়ে দেয়।
+            </p>
+            <ul class="comparison-list">
+              <li>
+                <span style="color: #10B981;">✓</span>
+                <span data-i18n-en="60-second pipeline from raw CSV to priority orders" data-i18n-bn="সাধারণ সেলস CSV ফাইল আপলোড করলেই ৬০ সেকেন্ডে সিদ্ধান্ত">সাধারণ সেলস CSV ফাইল আপলোড করলেই ৬০ সেকেন্ডে সিদ্ধান্ত</span>
+              </li>
+              <li>
+                <span style="color: #10B981;">✓</span>
+                <span data-i18n-en="Learns Eid, Boishakh & Mega Sale multipliers automatically" data-i18n-bn="ঈদ, পহেলা বৈশাখ ও মেগা সেলের প্রভাব নিজে থেকেই শিখে নেয়">ঈদ, পহেলা বৈশাখ ও মেগা সেলের প্রভাব নিজে থেকেই শিখে নেয়</span>
+              </li>
+              <li>
+                <span style="color: #10B981;">✓</span>
+                <span data-i18n-en="Direct WhatsApp supplier message copied in 1 click" data-i18n-bn="সাপ্লায়ারের জন্য তৈরি অর্ডার মেসেজ এক ক্লিকে WhatsApp-এ কপি">সাপ্লায়ারের জন্য তৈরি অর্ডার মেসেজ এক ক্লিকে WhatsApp-এ কপি</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       INTERACTIVE 3D VISUAL CHAMBER & SKU STATUS MATRIX
+       ========================================================================== -->
+  <section class="section-3d-chamber" id="chamber-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="3D SKU Status Matrix" data-i18n-bn="৩ডি পণ্য স্থিতি নিরীক্ষণ">৩ডি পণ্য স্থিতি নিরীক্ষণ</span>
+        <h2 class="section-title" data-i18n-en="Visual Inventory Status Chambers" data-i18n-bn="৩ডি ভিজ্যুয়াল স্ট্যাটাস চেম্বার">৩ডি ভিজ্যুয়াল স্ট্যাটাস চেম্বার</h2>
+        <p class="section-subtitle" data-i18n-en="Select any status tier below to inspect its behavior in 3D and understand its business implications." data-i18n-bn="যেকোনো ক্যাটাগরি নির্বাচন করে ৩ডি গুদামে এর অবস্থা ও করণীয় পরামর্শ দেখুন।">
+          যেকোনো ক্যাটাগরি নির্বাচন করে ৩ডি গুদামে এর অবস্থা ও করণীয় পরামর্শ দেখুন।
+        </p>
+      </div>
+
+      <div class="chamber-layout">
+        <!-- Status Tabs Left -->
+        <div class="status-nav-tabs">
+          <button class="status-tab-btn tab-critical active" data-status-key="critical">
+            <div class="tab-icon-box" style="color: #EF4444;">🔴</div>
+            <div class="tab-text">
+              <span class="tab-title" data-i18n-en="Critical Stockout" data-i18n-bn="জরুরি — স্টক শেষ হবে">জরুরি — স্টক শেষ হবে</span>
+              <span class="tab-sub" data-i18n-en="Will run out before restock can arrive" data-i18n-bn="১-৩ দিনের মধ্যে ফুরিয়ে যাবে">১-৩ দিনের মধ্যে ফুরিয়ে যাবে</span>
+            </div>
+          </button>
+
+          <button class="status-tab-btn tab-soon" data-status-key="soon">
+            <div class="tab-icon-box" style="color: #F59E0B;">🟠</div>
+            <div class="tab-text">
+              <span class="tab-title" data-i18n-en="Reorder This Week" data-i18n-bn="এই সপ্তাহে অর্ডার করুন">এই সপ্তাহে অর্ডার করুন</span>
+              <span class="tab-sub" data-i18n-en="Safe for 4-7 days; prepare PO now" data-i18n-bn="৪-৭ দিনের স্টক বাকি আছে">৪-৭ দিনের স্টক বাকি আছে</span>
+            </div>
+          </button>
+
+          <button class="status-tab-btn tab-ok" data-status-key="ok">
+            <div class="tab-icon-box" style="color: #10B981;">🟢</div>
+            <div class="tab-text">
+              <span class="tab-title" data-i18n-en="Healthy Inventory" data-i18n-bn="সব ঠিক আছে">সব ঠিক আছে</span>
+              <span class="tab-sub" data-i18n-en="Optimal buffer for 30-45 days" data-i18n-bn="পর্যাপ্ত নিরাপদ মজুত রয়েছে">পর্যাপ্ত নিরাপদ মজুত রয়েছে</span>
+            </div>
+          </button>
+
+          <button class="status-tab-btn tab-overstock" data-status-key="overstock">
+            <div class="tab-icon-box" style="color: #3B82F6;">🔵</div>
+            <div class="tab-text">
+              <span class="tab-title" data-i18n-en="Overstock & Dead" data-i18n-bn="বেশি স্টক / বিক্রি নেই">বেশি স্টক / বিক্রি নেই</span>
+              <span class="tab-sub" data-i18n-en="Excess capital locked; run promos" data-i18n-bn="টাকা আটকে আছে, ডিসকাউন্ট দিন">টাকা আটকে আছে, ডিসকাউন্ট দিন</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Chamber Visual Stage Right -->
+        <div class="chamber-view-stage">
+          <div class="chamber-detail-content">
+            <div class="chamber-text-area">
+              <span class="chamber-badge-pill" id="chamber-stage-badge" style="background: rgba(239, 68, 68, 0.2); color: #F87171;">CRITICAL (লাল সংকেত)</span>
+              <h3 id="chamber-stage-title" data-i18n-en="Emergency Restock Needed" data-i18n-bn="জরুরি রি-অর্ডার প্রয়োজন">জরুরি রি-অর্ডার প্রয়োজন</h3>
+              <div class="chamber-bangla-advisory" id="chamber-stage-advisory">
+                এই পণ্যগুলোর স্টক আগামী ১ থেকে ৩ দিনের মধ্যে শূন্য হবে। সাপ্লায়ারের ডেলিভারি সময় বিবেচনা করে এখনই নতুন চালান বুক না করলে ক্রেতারা ফিরে যাবে এবং নিশ্চিত বিক্রির টাকা হাতছাড়া হবে।
+              </div>
+            </div>
+
+            <!-- Meta statistics -->
+            <div class="chamber-meta-grid">
+              <div class="chamber-meta-card">
+                <div class="chamber-meta-val" style="color: #EF4444;">১.৮ দিন</div>
+                <div class="chamber-meta-lbl" data-i18n-en="Average Days Cover" data-i18n-bn="গড় মজুত দিন">গড় মজুত দিন</div>
+              </div>
+              <div class="chamber-meta-card">
+                <div class="chamber-meta-val" style="color: var(--accent-cyan);">৪৫ পিস</div>
+                <div class="chamber-meta-lbl" data-i18n-en="Rec. Order Batch" data-i18n-bn="সুপারিশকৃত অর্ডার">সুপারিশকৃত অর্ডার</div>
+              </div>
+              <div class="chamber-meta-card">
+                <div class="chamber-meta-val text-gradient-taka">৳৮৩,২৫০</div>
+                <div class="chamber-meta-lbl" data-i18n-en="Sales Protected" data-i18n-bn="সংরক্ষিত সম্ভাব্য বিক্রি">সংরক্ষিত সম্ভাব্য বিক্রি</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       FULL INTERACTIVE LIVE DASHBOARD PREVIEW (S2 & S3 PRD SIMULATION)
+       ========================================================================== -->
+  <section class="section-live-demo" id="live-demo">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="PRD Screen S2 & S3 Prototype" data-i18n-bn="পিআরডি স্ক্রিন এস২ ও এস৩ লাইভ ডেমো">পিআরডি স্ক্রিন এস২ ও এস৩ লাইভ ডেমো</span>
+        <h2 class="section-title" data-i18n-en="Experience the Working Dashboard" data-i18n-bn="কাজের ড্যাশবোর্ডটি নিজে পরখ করুন">কাজের ড্যাশবোর্ডটি নিজে পরখ করুন</h2>
+        <p class="section-subtitle" data-i18n-en="Switch between personas, filter stock status, click any row to inspect 60-day forecasts, or copy WhatsApp restock orders in 1 click." data-i18n-bn="রহিম ও সালমার ব্যবসার মধ্যে পরিবর্তন করুন, ফিল্টার করুন এবং যেকোনো পণ্যে ক্লিক করে ৬০ দিনের পূর্বাভাস ও ব্যাকটেস্ট ফলাফল দেখুন।">
+          রহিম ও সালমার ব্যবসার মধ্যে পরিবর্তন করুন, ফিল্টার করুন এবং যেকোনো পণ্যে ক্লিক করে ৬০ দিনের পূর্বাভাস ও ব্যাকটেস্ট ফলাফল দেখুন।
+        </p>
+      </div>
+
+      <!-- Simulated Browser Frame -->
+      <div class="demo-browser-chrome">
+        <div class="browser-bar">
+          <div class="browser-dots">
+            <span class="browser-dot dot-red"></span>
+            <span class="browser-dot dot-yellow"></span>
+            <span class="browser-dot dot-green"></span>
+          </div>
+
+          <div class="browser-address">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+            <span>app.demandiq.ai/d/sample-fcommerce/dashboard</span>
+          </div>
+
+          <!-- Persona Switcher -->
+          <div class="persona-switcher">
+            <span style="font-size: 0.75rem; color: var(--text-dim);" data-i18n-en="Persona:" data-i18n-bn="ব্যবসায়ী:">ব্যবসায়ী:</span>
+            <button class="persona-btn active" id="persona-rahim" data-i18n-en="Rahim (Fashion)" data-i18n-bn="রহিম (পোশাক)">রহিম (পোশাক)</button>
+            <button class="persona-btn" id="persona-salma" data-i18n-en="Salma (Grocery)" data-i18n-bn="সালমা (মুদি দোকান)">সালমা (মুদি দোকান)</button>
+          </div>
+        </div>
+
+        <!-- Dashboard Inner Application View -->
+        <div class="dashboard-inner">
+          <!-- Toolbar: Status Filter Chips & Search -->
+          <div class="dashboard-toolbar">
+            <div class="filter-chips">
+              <button class="filter-chip active" data-status="all" data-i18n-en="All SKUs" data-i18n-bn="সব পণ্য">সব পণ্য</button>
+              <button class="filter-chip" data-status="critical" data-i18n-en="Critical (Urgent)" data-i18n-bn="🔴 জরুরি">🔴 জরুরি</button>
+              <button class="filter-chip" data-status="soon" data-i18n-en="Soon (This Week)" data-i18n-bn="🟠 এই সপ্তাহে">🟠 এই সপ্তাহে</button>
+              <button class="filter-chip" data-status="ok" data-i18n-en="Healthy" data-i18n-bn="🟢 ঠিক আছে">🟢 ঠিক আছে</button>
+              <button class="filter-chip" data-status="overstock" data-i18n-en="Overstock" data-i18n-bn="🔵 বেশি স্টক">🔵 বেশি স্টক</button>
+              <button class="filter-chip" data-status="dead" data-i18n-en="Dead Stock" data-i18n-bn="⚪ বিক্রি নেই">⚪ বিক্রি নেই</button>
+            </div>
+
+            <div class="search-box-wrap">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 12px; top: 12px; color: var(--text-dim);"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" id="sku-search-input" placeholder="পণ্য বা SKU খুঁজুন..." data-i18n-en="Search SKU or name..." data-i18n-bn="পণ্য বা SKU খুঁজুন...">
+            </div>
+          </div>
+
+          <!-- Split Dashboard: 65% Priority Table, 35% Today's Action Cards -->
+          <div class="dashboard-split-grid">
+            <!-- Left (65%): Priority Restock Table -->
+            <div class="priority-table-card">
+              <div class="table-header-title">
+                <h4 data-i18n-en="Priority Restock Table (Sorted by Urgency)" data-i18n-bn="জরুরি অর্ডার অগ্রাধিকার তালিকা">জরুরি অর্ডার অগ্রাধিকার তালিকা</h4>
+                <span style="font-size: 0.75rem; color: var(--text-dim);" data-i18n-en="Click any row for 60-day forecast chart" data-i18n-bn="বিস্তারিত চার্ট দেখতে ক্লিক করুন">বিস্তারিত চার্ট দেখতে ক্লিক করুন</span>
+              </div>
+              <div class="table-responsive">
+                <table class="sku-table">
+                  <thead>
+                    <tr>
+                      <th data-i18n-en="Status" data-i18n-bn="অবস্থা">অবস্থা</th>
+                      <th data-i18n-en="Product & SKU" data-i18n-bn="পণ্য ও কোড">পণ্য ও কোড</th>
+                      <th data-i18n-en="Stock" data-i18n-bn="মজুত">মজুত</th>
+                      <th data-i18n-en="Days Cover" data-i18n-bn="চলবে">চলবে</th>
+                      <th data-i18n-en="Stockout" data-i18n-bn="শেষ তারিখ">শেষ তারিখ</th>
+                      <th data-i18n-en="Order Qty" data-i18n-bn="অর্ডার সংখ্যা">অর্ডার সংখ্যা</th>
+                      <th data-i18n-en="Money at Risk" data-i18n-bn="ঝুঁকিতে থাকা টাকা">ঝুঁকিতে থাকা টাকা</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sku-table-body">
+                    <!-- Injected by js/dashboard-sim.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Right (35%): আজকের করণীয় (Today's Actions) -->
+            <div class="actions-sidebar-card">
+              <div class="actions-header">
+                <h4 data-i18n-en="Today's Actions" data-i18n-bn="আজকের করণীয়">
+                  <span>⚡</span>
+                  <span data-i18n-en="Today's Actions" data-i18n-bn="আজকের করণীয়">আজকের করণীয়</span>
+                </h4>
+                <span style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700;">TOP 5 ACTIONS</span>
+              </div>
+
+              <div class="action-cards-list" id="action-cards-list">
+                <!-- Action cards populated by js/dashboard-sim.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       PRODUCT DETAIL MODAL (S3 PRD SPECIFICATION)
+       ========================================================================== -->
+  <div class="modal-overlay" id="product-modal">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div>
+          <span class="status-badge critical" id="modal-status-badge">CRITICAL</span>
+          <h3 id="modal-product-title" style="margin-top: 6px; font-size: 1.35rem;">Premium Cotton Panjabi White</h3>
+          <span id="modal-product-sku" style="font-size: 0.78rem; color: var(--text-dim);">PANJABI-001 • Fashion</span>
+        </div>
+        <button class="modal-close-btn" id="modal-close-btn" title="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Bangla Natural Advisory Banner -->
+        <div class="chamber-bangla-advisory" id="modal-bangla-advisory" style="margin-top: 0; margin-bottom: 20px;">
+          ঈদের আগের পিক সিজন! আগামী পরশু স্টক শেষ হয়ে যাবে। ৳৮৩,২৫০ টাকার বিক্রি রক্ষা করতে আজই ৪৫ পিস অর্ডার করুন।
+        </div>
+
+        <!-- 4 Key Numbers for this SKU -->
+        <div class="modal-kpis-row">
+          <div class="modal-kpi-item">
+            <span class="modal-kpi-lbl" data-i18n-en="Current Stock" data-i18n-bn="বর্তমান মজুত">বর্তমান মজুত</span>
+            <span class="modal-kpi-val" id="modal-stock-val">4 units</span>
+          </div>
+          <div class="modal-kpi-item">
+            <span class="modal-kpi-lbl" data-i18n-en="Days of Cover" data-i18n-bn="মজুত চলবে">মজুত চলবে</span>
+            <span class="modal-kpi-val" id="modal-cover-val" style="color: #EF4444;">1.8 Days</span>
+          </div>
+          <div class="modal-kpi-item">
+            <span class="modal-kpi-lbl" data-i18n-en="Recommended Reorder" data-i18n-bn="সুপারিশকৃত অর্ডার">সুপারিশকৃত অর্ডার</span>
+            <span class="modal-kpi-val" id="modal-order-val" style="color: var(--accent-cyan);">45 units</span>
+          </div>
+          <div class="modal-kpi-item">
+            <span class="modal-kpi-lbl" data-i18n-en="Money at Risk" data-i18n-bn="ঝুঁকিতে থাকা টাকা">ঝুঁকিতে থাকা টাকা</span>
+            <span class="modal-kpi-val text-gradient-taka" id="modal-risk-val">৳83,250</span>
+          </div>
+        </div>
+
+        <!-- Interactive 90-Day History + 60-Day Forecast Chart -->
+        <div class="chart-container-wrap">
+          <canvas id="detailForecastChart"></canvas>
+        </div>
+
+        <!-- Scientific Backtest & Validation Panel (PRD FR7) -->
+        <div class="backtest-box">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <strong style="color: var(--accent-cyan); font-size: 0.85rem;" data-i18n-en="Scientific Backtest Report (Last 28 Days Held Out)" data-i18n-bn="বৈজ্ঞানিক ব্যাকটেস্ট রিপোর্ট (বিগত ২৮ দিনের সত্যতা যাচাই)">বৈজ্ঞানিক ব্যাকটেস্ট রিপোর্ট (বিগত ২৮ দিনের সত্যতা যাচাই)</strong>
+            <span style="font-size: 0.72rem; color: #10B981; font-weight: 700;">✓ Model Verified</span>
+          </div>
+          <div class="backtest-grid">
+            <div>
+              <span class="modal-kpi-lbl">Selected Model</span>
+              <strong id="modal-model-name" style="font-size: 0.88rem; color: var(--text-main);">Holt-Winters</strong>
+            </div>
+            <div>
+              <span class="modal-kpi-lbl">Model WAPE Error</span>
+              <strong id="modal-wape-model" style="font-size: 0.88rem; color: #10B981;">11.4%</strong>
+            </div>
+            <div>
+              <span class="modal-kpi-lbl">Naive Baseline WAPE</span>
+              <strong id="modal-wape-naive" style="font-size: 0.88rem; color: #EF4444;">24.8%</strong>
+            </div>
+          </div>
+          <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 8px;" data-i18n-en="Model chosen automatically because its error was 54% lower than naive baseline on the held-out 28 days." data-i18n-bn="বিগত ২৮ দিনের ব্যাকটেস্টে এই মডেলটি সাধারণ অনুমানের চেয়ে ৫৪% বেশি নির্ভুল প্রমাণিত হওয়ায় স্বয়ংক্রিয়ভাবে নির্বাচিত হয়েছে।">
+            বিগত ২৮ দিনের ব্যাকটেস্টে এই মডেলটি সাধারণ অনুমানের চেয়ে ৫৪% বেশি নির্ভুল প্রমাণিত হওয়ায় স্বয়ংক্রিয়ভাবে নির্বাচিত হয়েছে।
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       SECTION: LOCAL EVENT MULTIPLIER CALENDAR (PRD S4, FR4, FR5)
+       ========================================================================== -->
+  <section class="section-events" id="events-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="PRD Screen S4 • Local Cultural Intelligence" data-i18n-bn="পিআরডি স্ক্রিন এস৪ • দেশীয় উৎসব ক্যালেন্ডার">পিআরডি স্ক্রিন এস৪ • দেশীয় উৎসব ক্যালেন্ডার</span>
+        <h2 class="section-title" data-i18n-en="Bangladesh Festival & Event Multipliers" data-i18n-bn="উৎসব ও ক্যাম্পেইন মাল্টিপ্লায়ার">উৎসব ও ক্যাম্পেইন মাল্টিপ্লায়ার</h2>
+        <p class="section-subtitle" data-i18n-en="Foreign forecasting tools ignore Eid and Boishakh. DemandIQ learns seasonal multipliers directly from your past sales curves — never hardcoded." data-i18n-bn="বিদেশি সফটওয়্যার আমাদের ঈদ বা বৈশাখের খোঁজ রাখে না। DemandIQ আপনার নিজস্ব বিক্রির ইতিহাস থেকে উৎসবের প্রভাব নিজে থেকে শিখে নেয়।">
+          বিদেশি সফটওয়্যার আমাদের ঈদ বা বৈশাখের খোঁজ রাখে না। DemandIQ আপনার নিজস্ব বিক্রির ইতিহাস থেকে উৎসবের প্রভাব নিজে থেকে শিখে নেয়।
+        </p>
+      </div>
+
+      <div class="events-cards-grid">
+        <!-- 1. Eid-ul-Fitr -->
+        <div class="event-card">
+          <div class="event-tag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 1 12 2Z"/></svg>
+            <span>FESTIVAL SURGE</span>
+          </div>
+          <h4 class="event-name" data-i18n-en="Eid-ul-Fitr 2024" data-i18n-bn="ঈদুল ফিতর ২০২৪">ঈদুল ফিতর ২০২৪</h4>
+          <div class="event-dates">Mar 25 – Apr 11 • Ramadan Rush</div>
+          <div class="event-multiplier-box">
+            <div>
+              <span class="modal-kpi-lbl">Learned Lift</span>
+              <div class="event-mult-val">+280% (2.8x)</div>
+            </div>
+            <span style="font-size: 0.72rem; color: #34D399; font-weight: 600;">2 Years Used</span>
+          </div>
+        </div>
+
+        <!-- 2. Pohela Boishakh -->
+        <div class="event-card">
+          <div class="event-tag" style="color: #F59E0B;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line></svg>
+            <span>CULTURAL EVENT</span>
+          </div>
+          <h4 class="event-name" data-i18n-en="Pohela Boishakh" data-i18n-bn="পহেলা বৈশাখ">পহেলা বৈশাখ</h4>
+          <div class="event-dates">Apr 10 – Apr 14 • New Year</div>
+          <div class="event-multiplier-box">
+            <div>
+              <span class="modal-kpi-lbl">Learned Lift</span>
+              <div class="event-mult-val" style="color: #F59E0B;">+190% (1.9x)</div>
+            </div>
+            <span style="font-size: 0.72rem; color: #FBBF24; font-weight: 600;">Ethnic Wear</span>
+          </div>
+        </div>
+
+        <!-- 3. 11.11 Mega Sale -->
+        <div class="event-card">
+          <div class="event-tag" style="color: #8B5CF6;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>E-COMMERCE FLASH</span>
+          </div>
+          <h4 class="event-name" data-i18n-en="11.11 Mega Sale" data-i18n-bn="১১.১১ মেগা সেল">১১.১১ মেগা সেল</h4>
+          <div class="event-dates">Nov 08 – Nov 12 • Flash Discounts</div>
+          <div class="event-multiplier-box">
+            <div>
+              <span class="modal-kpi-lbl">Learned Lift</span>
+              <div class="event-mult-val" style="color: #8B5CF6;">+320% (3.2x)</div>
+            </div>
+            <span style="font-size: 0.72rem; color: #A78BFA; font-weight: 600;">High Volume</span>
+          </div>
+        </div>
+
+        <!-- 4. Eid-ul-Adha -->
+        <div class="event-card">
+          <div class="event-tag" style="color: #10B981;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 1 12 2Z"/></svg>
+            <span>SACRIFICE FESTIVAL</span>
+          </div>
+          <h4 class="event-name" data-i18n-en="Eid-ul-Adha" data-i18n-bn="ঈদুল আযহা">ঈদুল আযহা</h4>
+          <div class="event-dates">Jun 10 – Jun 18 • Spices & Formal</div>
+          <div class="event-multiplier-box">
+            <div>
+              <span class="modal-kpi-lbl">Learned Lift</span>
+              <div class="event-mult-val">+240% (2.4x)</div>
+            </div>
+            <span style="font-size: 0.72rem; color: #34D399; font-weight: 600;">Meat Prep</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center;">
+        <button class="btn btn-secondary" id="btn-add-event">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span data-i18n-en="+ Add Custom Sale / Festival Campaign" data-i18n-bn="+ নতুন ক্যাম্পেইন বা সেল ইভেন্ট যোগ করুন">+ নতুন ক্যাম্পেইন বা সেল ইভেন্ট যোগ করুন</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION: INTERACTIVE ROI & MONEY-AT-RISK CALCULATOR
+       ========================================================================== -->
+  <section class="section-calculator" id="roi-calculator">
+    <div class="container">
+      <div class="calculator-card">
+        <div class="section-header" style="margin-bottom: 32px;">
+          <span class="section-tag" data-i18n-en="Interactive Business Impact" data-i18n-bn="আর্থিক লাভ ক্যালকুলেটর">আর্থিক লাভ ক্যালকুলেটর</span>
+          <h2 class="section-title" data-i18n-en="Calculate Your Protected Profit & Working Capital" data-i18n-bn="আপনার ব্যবসার সংরক্ষিত মুনাফা ও মূলধন হিসাব করুন">আপনার ব্যবসার সংরক্ষিত মুনাফা ও মূলধন হিসাব করুন</h2>
+        </div>
+
+        <div class="calc-grid">
+          <!-- Sliders Left -->
+          <div class="calc-inputs">
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label" data-i18n-en="Monthly Sales Turnover (৳)" data-i18n-bn="মাসিক বিক্রির পরিমাণ (টাকা)">মাসিক বিক্রির পরিমাণ (টাকা)</span>
+                <span class="slider-value" id="val-turnover">৳৫,০০,০০০</span>
+              </div>
+              <input type="range" class="calc-slider" id="calc-turnover" min="50000" max="3000000" step="25000" value="500000">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label" data-i18n-en="Total Active SKUs (Products)" data-i18n-bn="মোট সক্রিয় পণ্যের সংখ্যা (SKU)">মোট সক্রিয় পণ্যের সংখ্যা (SKU)</span>
+                <span class="slider-value" id="val-skus">৫০ টি SKU</span>
+              </div>
+              <input type="range" class="calc-slider" id="calc-skus" min="10" max="300" step="5" value="50">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span class="slider-label" data-i18n-en="Average Supplier Lead Time" data-i18n-bn="সাপ্লায়ারের গড় ডেলিভারি সময় (দিন)">সাপ্লায়ারের গড় ডেলিভারি সময় (দিন)</span>
+                <span class="slider-value" id="val-leadtime">৭ দিন</span>
+              </div>
+              <input type="range" class="calc-slider" id="calc-leadtime" min="2" max="21" step="1" value="7">
+            </div>
+          </div>
+
+          <!-- Calculated Results Right -->
+          <div class="calc-results-card">
+            <div class="calc-res-row">
+              <span class="modal-kpi-lbl" data-i18n-en="Recovered Lost Sales (Monthly)" data-i18n-bn="রক্ষা পাওয়া সম্ভাব্য বিক্রি (মাসিক)">রক্ষা পাওয়া সম্ভাব্য বিক্রি (মাসিক)</span>
+              <div class="calc-res-num text-gradient-taka" id="res-lost-sales">৳৪২,০০০</div>
+            </div>
+
+            <div class="calc-res-row">
+              <span class="modal-kpi-lbl" data-i18n-en="Dead Capital Unlocked from Slow SKUs" data-i18n-bn="অলস পণ্য থেকে উদ্ধার করা মূলধন">অলস পণ্য থেকে উদ্ধার করা মূলধন</span>
+              <div class="calc-res-num" style="color: #60A5FA;" id="res-dead-cash">৳৪০,৫০০</div>
+            </div>
+
+            <div class="calc-res-row" style="border-bottom: none; margin-bottom: 0;">
+              <span class="modal-kpi-lbl" data-i18n-en="Time Saved on Manual Notebook Inventory" data-i18n-bn="হাতে কলমে খাতার হিসাব বাঁচানো সময়">হাতে কলমে খাতার হিসাব বাঁচানো সময়</span>
+              <div class="calc-res-num" style="color: var(--accent-cyan);" id="res-hours-saved">৮ ঘণ্টা/সপ্তাহ</div>
+            </div>
+
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+              <span class="modal-kpi-lbl" data-i18n-en="Estimated 60-Day Cash Flow Boost" data-i18n-bn="৬০ দিনে মোট সম্ভাব্য আর্থিক উন্নতি">৬০ দিনে মোট সম্ভাব্য আর্থিক উন্নতি</span>
+              <div class="calc-res-num text-gradient" id="res-total-benefit">৳১,৬৫,০০০</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION: IN-BROWSER CSV UPLOAD & 60S PIPELINE SIMULATOR (S1 PRD)
+       ========================================================================== -->
+  <section class="section-upload-sim" id="upload-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="PRD Screen S1 • Fast Onboarding" data-i18n-bn="পিআরডি স্ক্রিন এস১ • ১ ক্লিকে আপলোড ও যাচাই">পিআরডি স্ক্রিন এস১ • ১ ক্লিকে আপলোড ও যাচাই</span>
+        <h2 class="section-title" data-i18n-en="Upload Sales CSV or Try Bundled Sample" data-i18n-bn="আপনার বিক্রির CSV ফাইল দিন অথবা নমুনা ডেটা দেখুন">আপনার বিক্রির CSV ফাইল দিন অথবা নমুনা ডেটা দেখুন</h2>
+        <p class="section-subtitle" data-i18n-en="Accepts simple columns: date, sku, qty. Bad dates are validated cleanly without silent dropping." data-i18n-bn="শুধু ৩টি কলাম থাকলেই চলে: তারিখ (date), পণ্যের কোড (sku) এবং বিক্রি (qty)।">
+          শুধু ৩টি কলাম থাকলেই চলে: তারিখ (date), পণ্যের কোড (sku) এবং বিক্রি (qty)।
+        </p>
+      </div>
+
+      <!-- Dropzone Simulator -->
+      <div class="upload-dropzone">
+        <div style="width: 56px; height: 56px; background: rgba(6, 182, 212, 0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; color: var(--accent-cyan);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        </div>
+        <h4 style="font-size: 1.25rem; margin-bottom: 8px;" data-i18n-en="Drag & Drop your sales CSV file here" data-i18n-bn="এখানে আপনার বিক্রির CSV ফাইল ড্র্যাগ করুন বা ক্লিক করুন">এখানে আপনার বিক্রির CSV ফাইল ড্র্যাগ করুন বা ক্লিক করুন</h4>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;" data-i18n-en="Supports .csv or Excel export from Facebook, WhatsApp orders or Khata app" data-i18n-bn="ফেসবুক, হোয়াটসঅ্যাপ বা দোকানের খাতা অ্যাপের যেকোনো CSV ফাইল সমর্থনযোগ্য">
+          ফেসবুক, হোয়াটসঅ্যাপ বা দোকানের খাতা অ্যাপের যেকোনো CSV ফাইল সমর্থনযোগ্য
+        </p>
+
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn btn-primary" id="btn-run-simulation" data-i18n-en="▶ Run 60-Second Pipeline Simulator" data-i18n-bn="▶ ৬০ সেকেন্ডের নমুনা অ্যানালাইসিস চালান">▶ ৬০ সেকেন্ডের নমুনা অ্যানালাইসিস চালান</button>
+          <a href="#" class="btn btn-secondary" id="btn-download-sales-csv" data-i18n-en="Download Sample Sales CSV" data-i18n-bn="নমুনা Sales CSV ডাউনলোড">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>নমুনা Sales CSV ডাউনলোড</span>
+          </a>
+          <a href="#" class="btn btn-secondary" id="btn-download-inv-csv" data-i18n-en="Download Inventory CSV" data-i18n-bn="নমুনা Inventory CSV">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            <span>নমুনা Inventory CSV</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Pipeline Execution Progress Visualizer -->
+      <div class="pipeline-progress-container" id="pipeline-progress">
+        <h4 style="font-size: 1rem; margin-bottom: 12px; color: var(--accent-cyan);" data-i18n-en="Autonomous 7-Step Pipeline Execution" data-i18n-bn="স্বয়ংক্রিয় ৭-ধাপের পাইপলাইন কার্যক্রম">স্বয়ংক্রিয় ৭-ধাপের পাইপলাইন কার্যক্রম</h4>
+        
+        <div class="pipeline-step" id="step-1">
+          <span style="font-weight: 700; color: var(--accent-cyan);">[1/5] Validate & Ingest:</span>
+          <span>Checking date formats, removing duplicate timestamps, aggregating daily SKU sales into SQLite...</span>
+        </div>
+        <div class="pipeline-step" id="step-2">
+          <span style="font-weight: 700; color: var(--accent-cyan);">[2/5] Festival Multiplier Extraction:</span>
+          <span>Extracting Eid-ul-Fitr (+280%) & Pohela Boishakh multipliers from historical sales...</span>
+        </div>
+        <div class="pipeline-step" id="step-3">
+          <span style="font-weight: 700; color: var(--accent-cyan);">[3/5] Dual Model Competition & Backtest:</span>
+          <span>Training Holt-Winters vs Croston SBA on 45 SKUs. Holding out last 28 days for WAPE scoring...</span>
+        </div>
+        <div class="pipeline-step" id="step-4">
+          <span style="font-weight: 700; color: var(--accent-cyan);">[4/5] Smart Reorder Planning:</span>
+          <span>Factoring lead time (7-14d), service level (90%), MOQ and safety stock. Calculating money at risk in ৳...</span>
+        </div>
+        <div class="pipeline-step" id="step-5">
+          <span style="font-weight: 700; color: #10B981;">[5/5] Bangla Natural Language Advisory:</span>
+          <span>Generating actionable Bengali advisory sentences and WhatsApp order text for Rahim...</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SECTION: METHOD & HONEST AI (PRD S6 METHOD & LIMITS)
+       ========================================================================== -->
+  <section class="section-three-numbers" id="method-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="PRD Section 6 & S6 • Honest by Default" data-i18n-bn="পিআরডি সেকশন ৬ • স্বচ্ছ ও বৈজ্ঞানিক অ্যালগরিদম">পিআরডি সেকশন ৬ • স্বচ্ছ ও বৈজ্ঞানিক অ্যালগরিদম</span>
+        <h2 class="section-title" data-i18n-en="Transparent Algorithms & Scientific Rigor" data-i18n-bn="বিজ্ঞানের শক্তিতে নির্ভুল পূর্বাভাস">বিজ্ঞানের শক্তিতে নির্ভুল পূর্বাভাস</h2>
+        <p class="section-subtitle" data-i18n-en="No black boxes. We show the exact statistical models used and verify forecast accuracy against an unbending 28-day backtest." data-i18n-bn="কোনো রহস্য বা বানানো সংখ্যা নয়। কোন মডেল কেন ব্যবহার করা হয়েছে এবং ব্যাকটেস্ট স্কোর কত — সবই চোখের সামনে স্পষ্ট।">
+          কোনো রহস্য বা বানানো সংখ্যা নয়। কোন মডেল কেন ব্যবহার করা হয়েছে এবং ব্যাকটেস্ট স্কোর কত — সবই চোখের সামনে স্পষ্ট।
+        </p>
+      </div>
+
+      <div class="kpi-cards-grid">
+        <!-- Model 1: Holt-Winters -->
+        <div class="kpi-card">
+          <div class="kpi-pill" style="background: rgba(16, 185, 129, 0.15); color: #34D399; margin-bottom: 12px; display: inline-block;">TREND + SEASONALITY</div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">Holt-Winters Exponential</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Used for steady and seasonal trending items like Panjabis and Sarees. Adjusts for day-of-week demand and festival lifts.
+          </p>
+        </div>
+
+        <!-- Model 2: Croston SBA -->
+        <div class="kpi-card">
+          <div class="kpi-pill" style="background: rgba(6, 182, 212, 0.15); color: #22D3EE; margin-bottom: 12px; display: inline-block;">INTERMITTENT DEMAND</div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">Croston SBA Method</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Syntetos-Boylan Approximation specifically built for slow-moving products where sales have many zero-demand days.
+          </p>
+        </div>
+
+        <!-- Metric: WAPE Error -->
+        <div class="kpi-card">
+          <div class="kpi-pill" style="background: rgba(139, 92, 246, 0.15); color: #A78BFA; margin-bottom: 12px; display: inline-block;">ACCURACY METRIC</div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">WAPE Benchmark</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Weighted Absolute Percentage Error computed on held-out 28 days. Compared directly against naive baselines.
+          </p>
+        </div>
+
+        <!-- Honesty Rules -->
+        <div class="kpi-card" style="border-color: rgba(245, 158, 11, 0.35);">
+          <div class="kpi-pill" style="background: rgba(245, 158, 11, 0.15); color: #FBBF24; margin-bottom: 12px; display: inline-block;">JUDGE CREDIBILITY</div>
+          <h4 style="font-size: 1.15rem; margin-bottom: 6px;">PRD Honesty Rules</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Every business parameter (lead time, cost, safety stock z-score) is visible and editable. No synthetic data claims are hidden.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       TARGET PERSONAS: RAHIM & SALMA STORIES
+       ========================================================================== -->
+  <section class="section-events" id="personas-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag" data-i18n-en="Real-World Impact • Built for Bangladesh" data-i18n-bn="বাংলাদেশের বাস্তব প্রেক্ষাপট">বাংলাদেশের বাস্তব প্রেক্ষাপট</span>
+        <h2 class="section-title" data-i18n-en="Engineered for Rahim & Salma" data-i18n-bn="রহিম এবং সালমার মতো উদ্যোক্তাদের জন্য তৈরি">রহিম এবং সালমার মতো উদ্যোক্তাদের জন্য তৈরি</h2>
+      </div>
+
+      <div class="comparison-grid" style="margin-top: 24px;">
+        <!-- Rahim Card -->
+        <div class="kpi-card" style="padding: 32px;">
+          <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #10B981, #06B6D4); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">👕</div>
+            <div>
+              <h4 style="font-size: 1.2rem;">রহিম — এফ-কমার্স পোশাক বিক্রেতা</h4>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Facebook & WhatsApp • ৪৫টি SKU • খাতা ও এক্সেলে হিসাব</span>
+            </div>
+          </div>
+          <p style="font-size: 0.92rem; color: #CBD5E1; line-height: 1.6; margin-bottom: 16px;">
+            "গত বছর ঈদের আগের রাতে আমার সবচেয়ে জনপ্রিয় সাদা সুতি পাঞ্জাবির স্টক শেষ হয়ে গিয়েছিল। সাপ্লায়ার থেকে আসতে ৭ দিন লাগে, ফলে অন্তত ৳১,৮০,০০০ টাকার বিক্রি হাতছাড়া হয়েছিল। DemandIQ এবার ১৫ দিন আগেই আমাকে সতর্ক করে দিয়েছে এবং ঠিক কত পিস আজই অর্ডার করতে হবে তা জানিয়ে দিয়েছে।"
+          </p>
+          <div style="font-size: 0.82rem; color: #34D399; font-weight: 700;">✓ ঈদের ২ সপ্তাহ আগেই অর্ডার কনফার্ম</div>
+        </div>
+
+        <!-- Salma Card -->
+        <div class="kpi-card" style="padding: 32px;">
+          <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 16px;">
+            <div style="width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #3B82F6, #8B5CF6); display: flex; align-items: center; justify-content: center; font-size: 1.4rem;">🏪</div>
+            <div>
+              <h4 style="font-size: 1.2rem;">সালমা — পাড়ার মুদি ও রিটেইল স্টোর</h4>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Neighborhood Retail • ১৮০টি SKU • সাপ্লায়ার লিড টাইম ৫-১৪ দিন</span>
+            </div>
+          </div>
+          <p style="font-size: 0.92rem; color: #CBD5E1; line-height: 1.6; margin-bottom: 16px;">
+            "মুদি দোকানে চাল-ডাল দ্রুত বিক্রি হলেও কিছু আমদানি করা বিস্কুট ও কসমেটিকসে ৳৬৫,০০০ টাকা অলস পড়ে থাকত। DemandIQ আমাকে কোন পণ্যে কত টাকা আটকে আছে তা চিহ্নিত করে দেয় এবং রমজানের আগে বান্ডেল অফার দিয়ে সম্পূর্ণ ক্যাশ তুলে নিতে সাহায্য করেছে।"
+          </p>
+          <div style="font-size: 0.82rem; color: #60A5FA; font-weight: 700;">✓ আটকে থাকা ৳৬৫,০০০ মূলধন পুনরুদ্ধার</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================================
+       SITE FOOTER
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-logo" style="margin-bottom: 16px;">
+            <div class="logo-icon" style="width: 36px; height: 36px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            </div>
+            <div class="brand-name">
+              DemandIQ
+              <span class="sub">Smart Restock</span>
+            </div>
+          </div>
+          <p style="color: var(--text-dim); font-size: 0.85rem; max-width: 320px; line-height: 1.6;">
+            AI inventory forecasting & smart restock decision engine for retailers and F-commerce in Bangladesh. Decisions, not just charts.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5 data-i18n-en="Product" data-i18n-bn="পণ্য">পণ্য</h5>
+          <ul>
+            <li><a href="#live-demo" data-i18n-en="Restock Dashboard" data-i18n-bn="রিস্টক ড্যাশবোর্ড">রিস্টক ড্যাশবোর্ড</a></li>
+            <li><a href="#three-section" data-i18n-en="3D Warehouse Twin" data-i18n-bn="৩ডি ডিজিটাল টুইন">৩ডি ডিজিটাল টুইন</a></li>
+            <li><a href="#events-section" data-i18n-en="Event Calendar" data-i18n-bn="উৎসব ক্যালেন্ডার">উৎসব ক্যালেন্ডার</a></li>
+            <li><a href="#roi-calculator" data-i18n-en="ROI Calculator" data-i18n-bn="আর্থিক লাভ ক্যালকুলেটর">আর্থিক লাভ ক্যালকুলেটর</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5 data-i18n-en="Method & PRD" data-i18n-bn="অ্যালগরিদম ও পিআরডি">অ্যালগরিদম ও পিআরডি</h5>
+          <ul>
+            <li><a href="#method-section" data-i18n-en="Holt-Winters Model" data-i18n-bn="হোল্ট-উইন্টার্স মডেল">হোল্ট-উইন্টার্স মডেল</a></li>
+            <li><a href="#method-section" data-i18n-en="Croston SBA" data-i18n-bn="ক্রোস্টন এসবিএ">ক্রোস্টন এসবিএ</a></li>
+            <li><a href="#method-section" data-i18n-en="28-Day Backtesting" data-i18n-bn="২৮ দিনের ব্যাকটেস্ট">২৮ দিনের ব্যাকটেস্ট</a></li>
+            <li><a href="#upload-section" data-i18n-en="Sample Datasets" data-i18n-bn="নমুনা ডেটাসেট">নমুনা ডেটাসেট</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5 data-i18n-en="Hackathon Track" data-i18n-bn="হ্যাকাথন ট্র্যাক">হ্যাকাথন ট্র্যাক</h5>
+          <ul>
+            <li><span style="color: var(--text-dim); font-size: 0.85rem;">CommerceSphere AI → DemandIQ</span></li>
+            <li><span style="color: var(--text-dim); font-size: 0.85rem;">Target: Working Prototype (Python/Flask)</span></li>
+            <li><span style="color: #10B981; font-size: 0.85rem;">✓ Offline Demo Ready</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2024 DemandIQ Smart Restock. All rights reserved. Built with pride for Bangladesh Retailers.</div>
+        <div>Version 1.0 • Designed for CommerceSphere AI Hackathon</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification element -->
+  <div class="toast-notice" id="app-toast">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toast-msg">Order copied to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/three-scene.js"></script>
+  <script src="js/dashboard-sim.js"></script>
+  <script src="js/roi-calculator.js"></script>
+  <script src="js/scroll-animations.js"></script>
+</body>
+</html>
